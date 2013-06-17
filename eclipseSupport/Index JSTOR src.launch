@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/LuceneBasicDemo/src/org/apache/lucene/demo/IndexFiles.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.apache.lucene.demo.IndexFiles"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-index /Users/Shared/index -docs /Users/ckempton/source/lit-1030j/atypon/product/jstor/src"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="LuceneBasicDemo"/>
+</launchConfiguration>
