@@ -1,6 +1,6 @@
 package org.apache.lucene.demo;
 
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,9 +21,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LongField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -86,8 +85,8 @@ public class IndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(new File(indexPath));
-      Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-      IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+      Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_31);
+      IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_31, analyzer);
 
       if (create) {
         // Create a new index in the directory, removing any
@@ -114,7 +113,7 @@ public class IndexFiles {
       // worth it when your index is relatively static (ie
       // you're done adding documents to it):
       //
-      // writer.forceMerge(1);
+      writer.forceMerge(1);
 
       writer.close();
 
@@ -140,7 +139,7 @@ public class IndexFiles {
    *  
    * @param writer Writer to the index where the given file/dir info will be stored
    * @param file The file to index, or the directory to recurse into to find files to index
-   * @throws IOException If there is a low-level I/O error
+   * @throws IOException
    */
   static void indexDocs(IndexWriter writer, File file)
     throws IOException {
@@ -174,23 +173,26 @@ public class IndexFiles {
           // field that is indexed (i.e. searchable), but don't tokenize 
           // the field into separate words and don't index term frequency
           // or positional information:
-          Field pathField = new StringField("path", file.getPath(), Field.Store.YES);
+          Field pathField = new Field("path", file.getPath(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
+          pathField.setIndexOptions(IndexOptions.DOCS_ONLY);
           doc.add(pathField);
 
           // Add the last modified date of the file a field named "modified".
-          // Use a LongField that is indexed (i.e. efficiently filterable with
+          // Use a NumericField that is indexed (i.e. efficiently filterable with
           // NumericRangeFilter).  This indexes to milli-second resolution, which
           // is often too fine.  You could instead create a number based on
           // year/month/day/hour/minutes/seconds, down the resolution you require.
           // For example the long value 2011021714 would mean
           // February 17, 2011, 2-3 PM.
-          doc.add(new LongField("modified", file.lastModified(), Field.Store.NO));
+          NumericField modifiedField = new NumericField("modified");
+          modifiedField.setLongValue(file.lastModified());
+          doc.add(modifiedField);
 
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
           // Note that FileReader expects the file to be in UTF-8 encoding.
           // If that's not the case searching for special characters will fail.
-          doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
+          doc.add(new Field("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
 
           if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
             // New index, so we just add the document (no old document can be there):

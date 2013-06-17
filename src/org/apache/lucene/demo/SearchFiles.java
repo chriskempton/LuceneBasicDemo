@@ -1,6 +1,6 @@
 package org.apache.lucene.demo;
 
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -27,9 +27,8 @@ import java.util.Date;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -45,12 +44,12 @@ public class SearchFiles {
   /** Simple command-line based search demo. */
   public static void main(String[] args) throws Exception {
     String usage =
-      "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/core/4_1_0/demo/ for details.";
+      "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/java/4_0/demo.html for details.";
     if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
       System.out.println(usage);
       System.exit(0);
     }
-
+    System.out.println("Search for 'qqq' to quit.");
     String index = "index";
     String field = "contents";
     String queries = null;
@@ -87,9 +86,9 @@ public class SearchFiles {
       }
     }
     
-    IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(index)));
+    IndexReader reader = IndexReader.open(FSDirectory.open(new File(index)));
     IndexSearcher searcher = new IndexSearcher(reader);
-    Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+    Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_31);
 
     BufferedReader in = null;
     if (queries != null) {
@@ -97,7 +96,7 @@ public class SearchFiles {
     } else {
       in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
     }
-    QueryParser parser = new QueryParser(Version.LUCENE_40, field, analyzer);
+    QueryParser parser = new QueryParser(Version.LUCENE_31, field, analyzer);
     while (true) {
       if (queries == null && queryString == null) {                        // prompt the user
         System.out.println("Enter query: ");
@@ -113,9 +112,11 @@ public class SearchFiles {
       if (line.length() == 0) {
         break;
       }
+      
       if(line.equals("qqq")) {
-    	  System.exit(0);  // The qqq query will quit the program
+    	  System.exit(0);   // Enter 'qqq' search query to quit.
       }
+      
       Query query = parser.parse(line);
       System.out.println("Searching for: " + query.toString(field));
             
@@ -134,6 +135,7 @@ public class SearchFiles {
         break;
       }
     }
+    searcher.close();
     reader.close();
   }
 
