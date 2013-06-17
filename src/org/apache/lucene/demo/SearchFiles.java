@@ -49,7 +49,7 @@ public class SearchFiles {
       System.out.println(usage);
       System.exit(0);
     }
-    System.out.println("Search for 'qqq' to quit.");
+    System.out.println("Search for 'qqq' to quit");
     String index = "index";
     String field = "contents";
     String queries = null;
